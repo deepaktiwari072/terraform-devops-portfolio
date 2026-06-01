@@ -103,8 +103,9 @@ resource "google_compute_router_nat" "main" {
 }
 
 resource "google_compute_instance" "web-01" {
-  machine_type = "e2-micro"
+  machine_type = var.machine_type
   name         = "${local.name_prefix}-web-01"
+  allow_stopping_for_update = true
   tags         = ["web-01"]
   boot_disk {
     initialize_params {
@@ -134,9 +135,10 @@ EOF
 }
 
 resource "google_compute_instance" "app-01" {
-  machine_type = "e2-micro"
+  machine_type = var.machine_type
   name         = "${local.name_prefix}-app-01"
   zone         = var.gcp_zone
+  allow_stopping_for_update = true
   tags         = ["app-01"]
   boot_disk {
     initialize_params {

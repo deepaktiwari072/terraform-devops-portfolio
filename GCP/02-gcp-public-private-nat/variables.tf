@@ -44,3 +44,9 @@ variable "gcp_project_name" {
 
 }
 
+variable "machine_type" {
+  type = string
+  description = "Defining machine type"
+  default = "e2-small"
+}
+
