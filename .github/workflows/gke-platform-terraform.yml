@@ -55,13 +55,13 @@ jobs:
           run: terrafrom validate
         
         - name: terraform plan
-          if: input.terraform_action == 'plan'
+          if: inputs.terraform_action == 'plan'
           run: terraform plan -var-file="${TF_VAR_FILE}"
 
         - name: Terraform apply
-          if: input.terraform_action == 'apply'
+          if: inputs.terraform_action == 'apply'
           run: terrafom apply -auto-approve -var-file="${TF_VAR_FILE}"
 
         - name: Terrafom destroy
-          if: input.terraform_action = 'destroy'
+          if: inputs.terraform_action = 'destroy'
           run: terraform destroy -auto-approve -var-file="${TF_VAR_FILE}"
