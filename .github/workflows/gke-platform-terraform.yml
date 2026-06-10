@@ -32,7 +32,7 @@ jobs:
 
       defaults:
         run:
-            working-directory:  ${{ var.TF_WORKING_DIR }}
+            working-directory:  ${{ vars.TF_WORKING_DIR }}
       steps:
         - name: checkout respository
           uses: action/checkout@v4
