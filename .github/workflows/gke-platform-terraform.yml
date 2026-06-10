@@ -46,7 +46,7 @@ jobs:
           uses: hashicorp/setup-terraform@v3
         
         - name: Terraform format check
-          uses: terraform fmt -check -recursive
+          run: terraform fmt -check -recursive
 
         - name: Terraform initialize
           run: terraform init
