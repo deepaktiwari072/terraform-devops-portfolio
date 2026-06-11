@@ -16,6 +16,6 @@ node_disk_size_gb = 30
 
 gke_deletion_protection = false
 
-git_owner  = "YOUR_GITHUB_USERNAME"
-git_repo   = "YOUR_REPOSITORY_NAME"
-git_branch = "main"
+github_owner  = "deepaktiwari072"
+github_repo   = "terraform-devops-portfolio"
+github_branch = "master"

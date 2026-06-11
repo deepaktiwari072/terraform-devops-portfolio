@@ -102,9 +102,9 @@ module "github_wif" {
 
   gcp_project_id  = var.gcp_project_id
   name_prefix     = local.name_prefix
-  github_owner    = var.git_owner
-  github_repo     = var.git_repo
-  github_branch   = var.git_branch
+  github_owner    = var.github_owner
+  github_repo     = var.github_repo
+  github_branch   = var.github_branch
   terraform_roles = var.terraform_deployer_roles
 
   depends_on = [module.apis]

@@ -106,17 +106,17 @@ variable "gcp_zone" {
   default     = "us-central1-a"
 }
 
-variable "git_owner" {
+variable "github_owner" {
   description = "GitHub username or organization that owns the repository."
   type        = string
 }
 
-variable "git_repo" {
+variable "github_repo" {
   description = "GitHub repository name allowed to deploy this infrastructure."
   type        = string
 }
 
-variable "git_branch" {
+variable "github_branch" {
   description = "GitHub branch allowed to authenticate to GCP."
   type        = string
   default     = "main"

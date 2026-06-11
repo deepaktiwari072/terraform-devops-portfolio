@@ -58,7 +58,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   # Example allowed identity:
   # repository = "deepak/my-repo"
   # ref        = "refs/heads/main"
-  attribute_condition = "attribute.repository == \"${var.git_owner}/${var.git_repo}\" && attribute.ref == \"refs/heads/${var.git_branch}\""
+  attribute_condition = "attribute.repository == \"${var.github_owner}/${var.github_repo}\" && attribute.ref == \"refs/heads/${var.github_branch}\""
 }
 
 # This binding allows the selected GitHub repository to impersonate the

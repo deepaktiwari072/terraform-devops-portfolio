@@ -8,17 +8,17 @@ variable "name_prefix" {
   type        = string
 }
 
-variable "git_owner" {
+variable "github_owner" {
   description = "GitHub organization or username that owns the repository."
   type        = string
 }
 
-variable "git_repo" {
+variable "github_repo" {
   description = "GitHub repository name allowed to authenticate to GCP."
   type        = string
 }
 
-variable "git_branch" {
+variable "github_branch" {
   description = "GitHub branch allowed to authenticate to GCP, for example main."
   type        = string
   default     = "main"
