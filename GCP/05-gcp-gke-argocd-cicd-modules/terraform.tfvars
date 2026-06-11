@@ -16,6 +16,6 @@ node_disk_size_gb = 30
 
 gke_deletion_protection = false
 
-github_owner  = "YOUR_GITHUB_USERNAME"
-github_repo   = "YOUR_REPOSITORY_NAME"
-github_branch = "main"
+git_owner  = "YOUR_GITHUB_USERNAME"
+git_repo   = "YOUR_REPOSITORY_NAME"
+git_branch = "main"
