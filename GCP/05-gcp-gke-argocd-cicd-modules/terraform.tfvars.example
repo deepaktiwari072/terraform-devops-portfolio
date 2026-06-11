@@ -1,0 +1,10 @@
+gcp_project_id = "project-b18ced1d-cbfc-41b5-ba1"
+gcp_region     = "us-central1"
+
+project_name = "gke-argocd-cicd"
+environment  = "dev"
+
+network_name  = "vpc"
+subnet_cidr   = "10.70.0.0/24"
+pods_cidr     = "10.71.0.0/16"
+services_cidr = "10.72.0.0/20"
