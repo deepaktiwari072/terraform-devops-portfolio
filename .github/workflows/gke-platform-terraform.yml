@@ -1,67 +1,89 @@
 name: GKE Platform Terraform
 
+# Runs manually to prevent accidental creation of costly GKE resources.
 on:
-  # Manual execution prevents costly GKE resources from being created
-  # automatically after every push 
   workflow_dispatch:
     inputs:
       terraform_action:
-          description:  "Terraform operation to execute"
-          required: true
-          type: choice
-          options:
-            - plan
-            - apply
-            - destroy
-          default: plan
+        description: "Terraform operation to execute"
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+        default: plan
+
+# Prevents multiple Terraform operations from running simultaneously.
+concurrency:
+  group: gke-platform-terraform
+  cancel-in-progress: false
+
 permissions:
-    # Allows GitHub action to read respository terraform files.
-    contents: read
+  # Required by actions/checkout to read repository files.
+  contents: read
 
-    # Allow Github to request an OIDC toekn for GCP authentication
-
-    id-token: write
+  # Required to request a GitHub OIDC token for GCP WIF authentication.
+  id-token: write
 
 env:
-    TF_WORKING_DIR: GCP/05-gcp-gke-argocd-cicd-modules
-    TF_VAR_FILE: terraform.tfvars
+  # Path to the Terraform root module inside the repository.
+  TF_WORKING_DIR: GCP/05-gcp-gke-argocd-cicd-modules
+
+  # Terraform automatically loads environment variables beginning with TF_VAR_.
+  TF_VAR_gcp_project_id: ${{ vars.GCP_PROJECT_ID }}
+  TF_VAR_github_owner: ${{ vars.GIT_OWNER }}
+  TF_VAR_github_repo: ${{ vars.GIT_REPO }}
+  TF_VAR_github_branch: ${{ vars.GIT_BRANCH }}
+
 jobs:
   terraform:
-      name: Terraform ${{ inputs.terraform_action }}
-      runs-on: ubuntu-latest
+    name: Terraform ${{ inputs.terraform_action }}
+    runs-on: ubuntu-latest
 
-      defaults:
-        run:
-            working-directory:  ${{ vars.TF_WORKING_DIR }}
-      steps:
-        - name: checkout respository
-          uses: action/checkout@v4
-          # Authenticatesto GCP using WIF instead of service account JSON key
-        - name: authenticate to Google Cloud
-          uses: google-github-action/auth@v3
-          with:
-              workload_identity_provider : ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-              service_account: ${{ vars.GCP_TERRAFORM_SERVICE_ACCOUNT }}
-        - name: Set up Terraform
-          uses: hashicorp/setup-terraform@v3
-        
-        - name: Terraform format check
-          run: terraform fmt -check -recursive
+    # Prevents a stuck Terraform command from running indefinitely.
+    timeout-minutes: 60
 
-        - name: Terraform initialize
-          run: terraform init
+    steps:
+      # Downloads the repository files onto the GitHub runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Terrafrom validate
-          run: terrafrom validate
-        
-        - name: terraform plan
-          if: inputs.terraform_action == 'plan'
-          run: terraform plan -var-file="${TF_VAR_FILE}"
+      # Authenticates to GCP using GitHub OIDC and Workload Identity
+      # Federation. No long-lived service account key is required.
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_TERRAFORM_SERVICE_ACCOUNT }}
 
-        - name: Terraform apply
-          if: inputs.terraform_action == 'apply'
-          run: terrafom apply -auto-approve -var-file="${TF_VAR_FILE}"
+      # Installs Terraform on the GitHub-hosted runner.
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
-        - name: Terrafom destroy
-          if: inputs.terraform_action == 'destroy'
-          run: terraform destroy -auto-approve -var-file="${TF_VAR_FILE}"
+      # Verifies that all Terraform files follow standard formatting.
+      - name: Terraform format check
+        run: terraform -chdir="${TF_WORKING_DIR}" fmt -check -recursive
+
+      # Downloads providers, modules, and connects to the remote backend.
+      - name: Terraform initialize
+        run: terraform -chdir="${TF_WORKING_DIR}" init
+
+      # Checks Terraform configuration syntax and internal references.
+      - name: Terraform validate
+        run: terraform -chdir="${TF_WORKING_DIR}" validate
+
+      # Displays proposed infrastructure changes without applying them.
+      - name: Terraform plan
+        if: inputs.terraform_action == 'plan'
+        run: terraform -chdir="${TF_WORKING_DIR}" plan
+
+      # Creates or updates infrastructure after manually selecting apply.
+      - name: Terraform apply
+        if: inputs.terraform_action == 'apply'
+        run: terraform -chdir="${TF_WORKING_DIR}" apply -auto-approve
+
+      # Deletes infrastructure after manually selecting destroy.
+      - name: Terraform destroy
+        if: inputs.terraform_action == 'destroy'
+        run: terraform -chdir="${TF_WORKING_DIR}" destroy -auto-approve
