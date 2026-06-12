@@ -27,14 +27,22 @@ permissions:
   id-token: write
 
 env:
-  # Path to the Terraform root module inside the repository.
   TF_WORKING_DIR: GCP/05-gcp-gke-argocd-cicd-modules
 
-  # Terraform automatically loads environment variables beginning with TF_VAR_.
   TF_VAR_gcp_project_id: ${{ vars.GCP_PROJECT_ID }}
+  TF_VAR_gcp_region: ${{ vars.GCP_REGION }}
+  TF_VAR_gcp_zone: ${{ vars.GCP_ZONE }}
+
+  TF_VAR_project_name: ${{ vars.PROJECT_NAME }}
+  TF_VAR_environment: ${{ vars.ENVIRONMENT }}
+
   TF_VAR_github_owner: ${{ vars.GIT_OWNER }}
   TF_VAR_github_repo: ${{ vars.GIT_REPO }}
   TF_VAR_github_branch: ${{ vars.GIT_BRANCH }}
+
+  # Terraform automatically loads environment variables beginning with TF_VAR_.
+  
+
 
 jobs:
   terraform:
